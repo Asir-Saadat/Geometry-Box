@@ -1,0 +1,356 @@
+import pygame
+from pygame.locals import *
+import math
+from shapely.geometry import Point, Polygon
+import pygame_widgets as pw
+# --- constants --- (UPPER_CASE names)
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 800
+WHITE = (255, 255, 255)
+RED   = (255,   0,   0)
+FPS = 30
+# --- main ---
+# - init -
+pi=3.141592653
+class rectangle_draw:
+    def __init__(self,x,y,width, height):
+        self.x=x
+        self.y=y
+        self.width=width
+        self.height=height
+
+
+
+class circle_draw:
+    def __init__(self,x,y,r):
+        self.x=x
+        self.y=y
+        self.r=r
+
+class line_draw:
+    def __init__(self,x1,y1,x2,y2):
+        self.x1=x1
+        self.y1=y1
+        self.x2=x2
+        self.y2=y2
+        if(x2-x1==0):
+            self.dhal = math.trunc(round((y2 - y1) / 0.0000000001))
+        else:
+            self.dhal = math.trunc(round((y2 - y1) / (x2 - x1)))
+        #self.dhal= math.trunc( round((y2-y1)/(x2-x1)))
+        self.c=math.trunc( round(y1-(self.dhal*x1)) )
+
+class arc_draw:
+    def __init__(self,x,y,r,start,end):
+        self.x=x
+        self.y=y
+        self.r=r
+        self.start=start
+        self.end=end
+
+
+class polygon_draw:
+    def __init__(self, list_of_x, list_of_y):
+        self.list_of_x=list_of_x[:]
+        self.list_of_y=list_of_y[:]
+
+    def get_polygon(self):
+        return_list=[]
+        for i in range(0,len(self.list_of_x)  ):
+            temp_list=[]
+            temp_list.append(self.list_of_x[i])
+            temp_list.append(self.list_of_y[i])
+            return_list.append(temp_list)
+
+        return return_list
+
+
+
+
+def draw_button():
+    button = pw.Button(
+        screen, 100, 100, 300, 150, text='Hello',
+        fontSize=50, margin=20,
+        inactiveColour=(255, 0, 0),
+        pressedColour=(0, 255, 0), radius=20,
+        onClick=lambda: print('Click')
+    )
+
+
+list_of_rectangles=[]
+
+rec_1=rectangle_draw(300, 134, 30, 30)
+list_of_rectangles.append( rec_1 )
+rec_2=rectangle_draw(200, 134, 30, 30)
+list_of_rectangles.append( rec_2 )
+rec_3=rectangle_draw(100, 134, 30, 30)
+list_of_rectangles.append( rec_3  )
+rec_4=rectangle_draw(50, 134, 30, 30)
+list_of_rectangles.append( rec_4 )
+circ_1=circle_draw(300,300,20)
+list_of_rectangles.append( circ_1 )
+line_1=line_draw( 40,20,100,20 )
+list_of_rectangles.append( line_1 )
+arc_1=arc_draw( 200,300,100, pi,2*pi )
+list_of_rectangles.append( arc_1)
+
+pp1=[200,30,60]
+pp2=[50,40,70]
+poly= polygon_draw( pp1,pp2 )
+list_of_rectangles.append( poly )
+
+
+
+
+
+
+pygame.init()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+current=-1
+# - objects -
+
+rectangle = pygame.rect.Rect(260, 134, 60, 60)
+#print(rectangle.x)
+#print(rectangle.y)
+#This two are the corner values of the rectangle
+#this is the width of the rectangle
+#this is the height of the rectangle
+
+rectangle_draging = False
+
+# - mainloop -
+
+clock = pygame.time.Clock()
+
+running = True
+
+while running:
+
+    # - events -
+
+   # pp = rectangle_draw( 20,30,40,50 )
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                for x in range( 0,len(list_of_rectangles) ):
+                    if (type(list_of_rectangles[x]) == (rectangle_draw)):
+                        mouse_temp_x,mouse_temp_y=event.pos
+                        #print(event.pos)
+                        #print( list_of_rectangles[x].x )
+                        #print( list_of_rectangles[x].width +  list_of_rectangles[x].x )
+                        #print(list_of_rectangles[x].y)
+                        #print(list_of_rectangles[x].height + list_of_rectangles[x].y)
+                        if mouse_temp_x>=list_of_rectangles[x].x and\
+                                mouse_temp_x<=list_of_rectangles[x].width+list_of_rectangles[x].x and\
+                                mouse_temp_y>=list_of_rectangles[x].y and\
+                                mouse_temp_y<=list_of_rectangles[x].height+\
+                                list_of_rectangles[x].y :
+                            #print("tf")
+                            rectangle_draging = True
+                            mouse_x, mouse_y = event.pos
+                            offset_x = list_of_rectangles[x].x - mouse_x
+                            offset_y = list_of_rectangles[x].y - mouse_y
+                            current=x
+
+                    if(  type(list_of_rectangles[x]) == (circle_draw)) :
+                        mouse_temp_x, mouse_temp_y = event.pos
+
+                        if mouse_temp_x >= list_of_rectangles[x].x-list_of_rectangles[x].r and\
+                                mouse_temp_x <= list_of_rectangles[x].x+list_of_rectangles[x].r and\
+                                mouse_temp_y >= list_of_rectangles[x].y -list_of_rectangles[x].r and\
+                                mouse_temp_y <=list_of_rectangles[x].y +list_of_rectangles[x].r and\
+                                ((list_of_rectangles[x].x-mouse_temp_x)**2 +
+                                 (list_of_rectangles[x].y-mouse_temp_y)**2)**.5 <=list_of_rectangles[x].r :
+                            rectangle_draging = True
+                            mouse_x, mouse_y = event.pos
+                            offset_x = list_of_rectangles[x].x - mouse_x
+                            offset_y = list_of_rectangles[x].y - mouse_y
+                            current = x
+
+
+                    if( type(list_of_rectangles[x])==(line_draw) ):
+                        mouse_temp_x, mouse_temp_y = event.pos
+
+                        temp_obj=list_of_rectangles[x]
+
+                        if(  math.trunc(round(mouse_temp_y- temp_obj.dhal*mouse_temp_x)) <= math.trunc(round(temp_obj.c) )+10 and
+                                math.trunc(round(mouse_temp_y- temp_obj.dhal*mouse_temp_x)) >= math.trunc(round(temp_obj.c) )-10 and
+                                mouse_temp_y >= min(temp_obj.y1, temp_obj.y2)-5 and mouse_temp_y<=max(temp_obj.y1, temp_obj.y2)+5 and
+                                mouse_temp_x >= min(temp_obj.x1, temp_obj.x2)-5 and mouse_temp_x <= max(temp_obj.x1,
+                                                                                                      temp_obj.x2)+5  ):
+                            rectangle_draging = True
+                            mouse_x, mouse_y = event.pos
+                            offset_x = list_of_rectangles[x].x1 - mouse_x
+                            offset_y = list_of_rectangles[x].y1 - mouse_y
+                            offset_x2 = list_of_rectangles[x].x2 - mouse_x
+                            offset_y2 = list_of_rectangles[x].y2 - mouse_y
+
+                            current = x
+
+
+                    if( type(list_of_rectangles[x])==(arc_draw) ):
+                        mouse_temp_x, mouse_temp_y = event.pos
+                        temp_obj = list_of_rectangles[x]
+                        cone=-((((math.atan(  (temp_obj.y-mouse_temp_y)/(temp_obj.x-mouse_temp_x+000000000.1)  ) )))*180)/pi
+                        if(cone<0):
+                            cone=180-abs(cone)
+
+                        if( mouse_temp_y>temp_obj.y  ):
+                            cone+=180
+
+                        cone=(cone*pi)/180
+
+
+                        #print(temp_obj.y)
+                        #print(mouse_temp_y)
+                        #print(temp_obj.x)
+                        #print(mouse_temp_x)
+                        #print(cone)
+
+
+
+                        if( mouse_temp_x>=temp_obj.x-temp_obj.r and
+                                mouse_temp_x <= temp_obj.x + temp_obj.r and
+                                mouse_temp_y >= temp_obj.y - temp_obj.r and
+                                mouse_temp_y <= temp_obj.y + temp_obj.r and
+                                cone>=temp_obj.start and
+                                cone<=temp_obj.end and
+                                ((mouse_temp_x-temp_obj.x)**2 + (mouse_temp_y-temp_obj.y)**2)**0.5 <=temp_obj.r+5
+                                and ((mouse_temp_x - temp_obj.x) ** 2 + (mouse_temp_y - temp_obj.y) ** 2)**0.5 >= temp_obj.r - 5
+                                 ):
+                            rectangle_draging = True
+                            mouse_x, mouse_y = event.pos
+                            offset_x = list_of_rectangles[x].x - mouse_x
+                            offset_y = list_of_rectangles[x].y - mouse_y
+                            current = x
+
+
+                    if( type( list_of_rectangles[x] )==(polygon_draw) ):
+                        coords =  list_of_rectangles[x].get_polygon()
+                        poly = Polygon(coords)
+                        mouse_temp_x, mouse_temp_y = event.pos
+                        p1=Point( mouse_temp_x, mouse_temp_y )
+
+
+                        if( p1.within(poly) ):
+                            offset_x_list=[]
+                            offset_y_list=[]
+                            rectangle_draging = True
+                            current = x
+                            for i in range(len(coords ) ):
+                                offset_x_list.append(mouse_temp_x-coords[i][0] )
+
+
+                            for i in range(len(coords ) ):
+                                offset_y_list.append( mouse_temp_y-coords[i][1])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                rectangle_draging = False
+
+        elif event.type == pygame.MOUSEMOTION:
+            if rectangle_draging:
+
+                if( type( list_of_rectangles[current] )==(line_draw)  ):
+                    mouse_x, mouse_y = event.pos
+                    list_of_rectangles[current].x1 = mouse_x + offset_x
+                    list_of_rectangles[current].y1 = mouse_y + offset_y
+                    list_of_rectangles[current].x2 = mouse_x + offset_x2
+                    list_of_rectangles[current].y2 = mouse_y + offset_y2
+
+
+                    if( (list_of_rectangles[current].x2 - list_of_rectangles[current].x1)==0  ):
+                        list_of_rectangles[current].dhal = math.trunc(round(
+                            (list_of_rectangles[current].y2 - list_of_rectangles[current].y1) / (
+                                        0.000000001)))
+
+                    else:
+                        list_of_rectangles[current].dhal = math.trunc(round((list_of_rectangles[current].y2 - list_of_rectangles[current].y1) / (list_of_rectangles[current].x2 - list_of_rectangles[current].x1)))
+                        list_of_rectangles[current].c = math.trunc(round(list_of_rectangles[current].y1 - (list_of_rectangles[current].dhal * list_of_rectangles[current].x1)))
+
+
+                if( type( list_of_rectangles[current] )==(polygon_draw)  ):
+                    mouse_x, mouse_y = event.pos
+                    temp_obj=list_of_rectangles[current]
+                    for i in range( 0,len(offset_x_list) ):
+                        temp_obj.list_of_x[i]=mouse_x- offset_x_list[i]
+
+                    for i in range( 0,len(offset_y_list) ):
+                        temp_obj.list_of_y[i]=mouse_y- offset_y_list[i]
+
+
+
+
+
+
+                else:
+
+                    mouse_x, mouse_y = event.pos
+                    list_of_rectangles[current].x = mouse_x + offset_x
+                    list_of_rectangles[current].y = mouse_y + offset_y
+
+
+
+    screen.fill(WHITE)
+    for obj in list_of_rectangles:
+        if (type(obj) == (rectangle_draw)):
+            temp_rect=(obj.x,obj.y,obj.height,obj.width)
+            pygame.draw.rect(screen, RED, temp_rect)
+
+        elif (type(obj) == (circle_draw)):
+            temp_rect=(obj.x,obj.y)
+            pygame.draw.circle(screen, RED, temp_rect, obj.r )
+
+        elif(type(obj) == (line_draw)  ):
+            temp_rect=(obj.x1,obj.y1)
+            pygame.draw.line(screen, RED, temp_rect, (obj.x2, obj.y2) )
+
+        elif( type(obj) == (arc_draw)   ):
+            #temp_rect = (obj.x, obj.y1)
+            pygame.draw.arc(screen, RED,  [ obj.x-obj.r , obj.y-obj.r,2*obj.r,2*obj.r ] ,  obj.start, obj.end)
+
+        elif( type( obj )==(polygon_draw) ):
+            wow=[]
+
+            pygame.draw.polygon(screen, RED, obj.get_polygon())
+
+
+
+
+
+
+
+
+
+
+
+    #I have to use this using for loop
+    #pygame.draw.rect(screen, RED, rectangle)
+    pygame.display.flip()
+
+    # - constant game speed / FPS -
+
+    clock.tick(FPS)
+
+# - end -
+
+pygame.quit()
