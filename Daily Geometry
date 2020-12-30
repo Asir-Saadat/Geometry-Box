@@ -3,14 +3,26 @@ from pygame.locals import *
 import math
 from shapely.geometry import Point, Polygon
 import pygame_widgets as pw
+import Button_part_2
+from functools import reduce
+import operator
+import math
+
+
 # --- constants --- (UPPER_CASE names)
+pygame.init()
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 WHITE = (255, 255, 255)
 RED   = (255,   0,   0)
+BLACK = (0,0,0)
+BLUE=(0,0,255)
 FPS = 30
-# --- main ---
-# - init -
+COLOR_INACTIVE = pygame.Color('lightskyblue3')
+COLOR_ACTIVE = pygame.Color('dodgerblue2')
+FONT = pygame.font.Font('Wishleman.ttf', 12)
+increment_line=25
+
 pi=3.141592653
 class rectangle_draw:
     def __init__(self,x,y,width, height):
@@ -18,6 +30,30 @@ class rectangle_draw:
         self.y=y
         self.width=width
         self.height=height
+        self.fill=1
+        self.box1_rec = InputBox(10, 100, 50, 32)
+        self.box2_rec = InputBox(70, 100, 50, 32)
+        self.box3_rec = InputBox(10, 150, 50, 32)
+        self.box4_rec = InputBox(70, 150, 50, 32)
+        self.boxes_rec = [input_box1_circle, input_box2_circle, input_box3_circle, input_box4_rec]
+        self.rec_fill = button((255, 255, 255), 10, 200, 60, 32, 'Fill')
+        self.rec_back = button((255, 255, 255), 10, 250, 60, 32, 'Back')
+
+    def draw(self):
+        #self.box1_circle.change_text()
+        self.box1_rec.txt_surface = FONT.render( str(self.x), True, BLUE)
+        self.box1_rec.draw(screen)
+        #self.box2_circle.change_text()
+        self.box2_rec.txt_surface = FONT.render( str(self.y), True, BLUE)
+        self.box2_rec.draw(screen)
+        #self.box3_circle.change_text()
+        self.box3_rec.txt_surface = FONT.render( str(self.width), True, BLUE)
+        self.box3_rec.draw(screen)
+        self.box4_rec.txt_surface = FONT.render(str(self.height), True, BLUE)
+        self.box4_rec.draw(screen)
+        self.rec_fill.draw(screen, (0, 0, 0))
+        self.rec_back.draw(screen, (0, 0, 0))
+
 
 
 
@@ -26,6 +62,40 @@ class circle_draw:
         self.x=x
         self.y=y
         self.r=r
+        self.width=1
+        self.box1_circle = InputBox(10, 100, 50, 32)
+        self.box2_circle = InputBox(70, 100, 50, 32)
+        self.box3_circle = InputBox(10, 150, 50, 32)
+        self.boxes_circle = [input_box1_circle, input_box2_circle, input_box3_circle]
+        self.circle_fill = button((255, 255, 255), 10, 200, 60, 32, 'Fill')
+        self.circle_back= button((255, 255, 255  ), 10, 250, 60, 32, 'Back')
+
+    def draw(self):
+        #self.box1_circle.change_text()
+        self.box1_circle.txt_surface = FONT.render( str(self.x), True, BLUE)
+        self.box1_circle.draw(screen)
+        #self.box2_circle.change_text()
+        self.box2_circle.txt_surface = FONT.render( str(self.y), True, BLUE)
+        self.box2_circle.draw(screen)
+        #self.box3_circle.change_text()
+        self.box3_circle.txt_surface = FONT.render( str(self.r), True, BLUE)
+        self.box3_circle.draw(screen)
+        self.circle_fill.draw(screen, (0, 0, 0))
+        self.circle_back.draw(screen, (0, 0, 0))
+            #print("kaka")
+
+        for event in pygame.event.get():
+        #if (self.circle_fill.isOver(pygame.mouse.get_pos())):
+            if event.type == pygame.MOUSEBUTTONDOWN:
+               # pos = pygame.mouse.get_pos()
+                if (self.circle_fill.isOver(pygame.mouse.get_pos())):
+                    #print("pp")
+                    if (self.width == 1):
+                        self.width = 0
+                    else:
+                        self.width = 1
+
+            #list_of_rectangles.append(circ_1)
 
 class line_draw:
     def __init__(self,x1,y1,x2,y2):
@@ -35,24 +105,108 @@ class line_draw:
         self.y2=y2
         if(x2-x1==0):
             self.dhal = math.trunc(round((y2 - y1) / 0.0000000001))
+
+        elif(y2-y1==0):
+            self.dhal = math.trunc(round(0.0000000001 / (x2 - x1)))
         else:
             self.dhal = math.trunc(round((y2 - y1) / (x2 - x1)))
+
+        #print(self.dhal)
+
+
         #self.dhal= math.trunc( round((y2-y1)/(x2-x1)))
         self.c=math.trunc( round(y1-(self.dhal*x1)) )
+        self.box1_line = InputBox(10, 100, 50, 32)
+        self.box2_line = InputBox(70, 100, 50, 32)
+        self.box3_line = InputBox(10, 150, 50, 32)
+        self.box4_line = InputBox(70, 150, 50, 32)
+        self.boxes_line = [input_box1_line, input_box2_line, input_box3_line,input_box4_line ]
+        #self.circle_fill = button((255, 255, 255), 10, 200, 60, 32, 'Fill')
+        self.line_back = button((255, 255, 255), 10, 200, 60, 32, 'Back')
+
+    def draw(self):
+        #self.box1_circle.change_text()
+        self.box1_line.txt_surface = FONT.render( str(self.x1), True, BLUE)
+        self.box1_line.draw(screen)
+        #self.box2_circle.change_text()
+        self.box2_line.txt_surface = FONT.render( str(self.y1), True, BLUE)
+        self.box2_line.draw(screen)
+        #self.box3_circle.change_text()
+        self.box3_line.txt_surface = FONT.render( str(self.x2), True, BLUE)
+        self.box3_line.draw(screen)
+        self.box4_line.txt_surface = FONT.render(str(self.y2), True, BLUE)
+        self.box4_line.draw(screen)
+        #self.circle_fill.draw(screen, (0, 0, 0))
+        self.line_back.draw(screen, (0, 0, 0))
 
 class arc_draw:
-    def __init__(self,x,y,r,start,end):
+    def __init__(self,x,y,start,end, r):
         self.x=x
         self.y=y
         self.r=r
         self.start=start
         self.end=end
+        self.box1_arc = InputBox(10, 100, 50, 32)
+        self.box2_arc = InputBox(70, 100, 50, 32)
+        self.box3_arc = InputBox(10, 150, 50, 32)
+        self.box4_arc = InputBox(70, 150, 50, 32)
+        self.box5_arc = InputBox(10, 200, 50, 32)
+
+        #self.boxes_arc = [input_box1_arc, input_box2_arc, input_box3_arc, input_box4_arc, input_box5_arc]
+
+    def draw(self):
+        #self.box1_circle.change_text()
+        self.box1_arc.txt_surface = FONT.render( str(self.x), True, BLUE)
+        self.box1_arc.draw(screen)
+        #self.box2_circle.change_text()
+        self.box2_arc.txt_surface = FONT.render( str(self.y), True, BLUE)
+        self.box2_arc.draw(screen)
+        #self.box3_circle.change_text()
+        self.box3_arc.txt_surface = FONT.render( str(self.start), True, BLUE)
+        self.box3_arc.draw(screen)
+        self.box4_arc.txt_surface = FONT.render(str(self.end), True, BLUE)
+        self.box4_arc.draw(screen)
+        self.box5_arc.txt_surface = FONT.render(str(self.r), True, BLUE)
+        self.box5_arc.draw(screen)
+
+
+        #self.circle_fill.draw(screen, (0, 0, 0))
+        #self.arc_back.draw(screen, (0, 0, 0))
+
+
 
 
 class polygon_draw:
     def __init__(self, list_of_x, list_of_y):
         self.list_of_x=list_of_x[:]
         self.list_of_y=list_of_y[:]
+        self.width=1
+        self.fill = 1
+        self.poly_back = button((255, 255, 255), 10, 50, 60, 32, 'Back')
+        self.poly_fill = button((255, 255, 255), 70, 50, 60, 32, 'Fill')
+        coords=[]
+
+        for i in range(0, len(self.list_of_x) ):
+            oo=[]
+            oo.append( self.list_of_x[i] )
+            oo.append( self.list_of_y[i] )
+            coords.append(oo)
+
+        center = tuple(map(operator.truediv, reduce(lambda x, y: map(operator.add, x, y), coords), [len(coords)] * 2))
+        abar=(sorted(coords, key=lambda coord: (-135 - math.degrees(
+            math.atan2(*tuple(map(operator.sub, coord, center))[::-1]))) % 360))
+
+        self.list_of_x.clear()
+        self.list_of_y.clear()
+        print(abar)
+
+        for i in range (0, len( abar )  ):
+            self.list_of_x.append( abar[i][0] )
+            self.list_of_y.append(abar[i][1])
+
+
+
+
 
     def get_polygon(self):
         return_list=[]
@@ -64,49 +218,194 @@ class polygon_draw:
 
         return return_list
 
+    def draw(self):
+
+        start=100
+        self.poly_back.draw(screen, (0, 0, 0))
+        self.poly_fill.draw(screen, (0, 0, 0))
+
+
+        for i in range( 0, len(self.list_of_x ) ):
+            temp_box_1 = InputBox(10, start, 50, 32)
+            temp_box_2 = InputBox(70, start, 50, 32)
+            start+=50
+            temp_box_1.txt_surface = FONT.render(str(self.list_of_x[i] ), True, BLUE)
+            temp_box_1.draw(screen)
+            temp_box_2.txt_surface = FONT.render(str(self.list_of_y[i] ), True, BLUE)
+            temp_box_2.draw(screen)
 
 
 
-def draw_button():
-    button = pw.Button(
-        screen, 100, 100, 300, 150, text='Hello',
-        fontSize=50, margin=20,
-        inactiveColour=(255, 0, 0),
-        pressedColour=(0, 255, 0), radius=20,
-        onClick=lambda: print('Click')
-    )
+
+
+
+
+
+class InputBox:
+
+    def __init__(self, x, y, w, h, text=''):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.color = COLOR_INACTIVE
+        self.text = text
+        self.txt_surface = FONT.render(text, True, self.color)
+        self.active = False
+        self.pp=[] #These are only for polygon
+
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                # Toggle the active variable.
+                self.active = not self.active
+            else:
+                self.active = False
+            # Change the current color of the input box.
+            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+        if event.type == pygame.KEYDOWN:
+            if self.active:
+                if event.key == pygame.K_RETURN:
+                    self.pp.append( int(self.text ) )
+                    print(self.text)
+                    self.text = ''
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                # Re-render the text.
+                self.txt_surface = FONT.render(self.text, True, self.color)
+
+    def update(self):
+        # Resize the box if the text is too long.
+        width = max(50, self.txt_surface.get_width()+10)
+        self.rect.w = width
+
+    def draw(self, screen):
+        # Blit the text.
+        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        # Blit the rect.
+        pygame.draw.rect(screen, self.color, self.rect, 2)
+
+    def change_text(self):
+        self.text=''
+
+
+
+
+def draw_rect_outline(surface, rect, color, width=1):
+    x, y, w, h = rect
+    width = max(width, 1)  # Draw at least one rect.
+    width = min(min(width, w//2), h//2)  # Don't overdraw.
+
+    # This draws several smaller outlines inside the first outline. Invert
+    # the direction if it should grow outwards.
+    for i in range(width):
+        pygame.gfxdraw.rectangle(screen, (x+i, y+i, w-i*2, h-i*2), color)
+
+
+def graph_draw():
+    for x in range( 600, 1200, increment_line ):
+        if( x==600 ):
+            pygame.draw.line(screen, BLUE, (x, 0), (x, 800), 5)
+        else:
+            pygame.draw.line(screen,BLACK, ( x, 0 ) , ( x,800 )  )
+
+    for x in range( 600-increment_line, 0, -increment_line ):
+        pygame.draw.line( screen,BLACK, ( x, 0 ) , ( x, 800 )  )
+
+
+    for x in range( 400, 800, increment_line ):
+        if (x == 400):
+            pygame.draw.line( screen,BLUE, ( 0, x ) , ( 1200, x ) ,5 )
+        else:
+            pygame.draw.line( screen,BLUE, ( 0, x ) , ( 1200, x )  )
+            #message_to_screen(str(start_count), blue, 600 + 10, x, 10)
+
+
+
+class button():
+    def __init__(self, color, x, y, width, height, text=''):
+        self.color = color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.text = text
+
+    def draw(self, win, outline):
+        # Call this method to draw the button on the screen
+        if outline:
+            draw_rect_outline(screen, (self.x - 2, self.y - 2, self.width + 4, self.height + 4), (255, 0, 0), 1)
+
+            #pygame.draw.rect(screen, (0, 100, 255), (self.x - 2, self.y - 2, self.width + 4, self.height + 4), 0)
+
+        #pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height), 0)
+
+        if self.text != '':
+            font = pygame.font.Font('Wishleman.ttf', 15)
+            pos = pygame.mouse.get_pos()
+            #print(pos[0])
+            #print(pos[1])
+            if( pos[0]>=self.x and pos[0]<=self.x+self.width  and pos[1]>=self.y and pos[1]<=self.y+self.height):
+                #print("asdhnjqwedwqe")
+                text = font.render(self.text, 1, (0,255,255))
+                win.blit(text, (
+                    self.x + (self.width / 2 - text.get_width() / 2),
+                    self.y + (self.height / 2 - text.get_height() / 2)))
+            else:
+                text = font.render(self.text, 1, (RED))
+                win.blit(text, (
+                    self.x + (self.width / 2 - text.get_width() / 2),
+                    self.y + (self.height / 2 - text.get_height() / 2)))
+            #text = font.render(self.text, 1, (RED))
+
+
+    def isOver(self, pos):
+        # Pos is the mouse position or a tuple of (x,y) coordinates
+        if pos[0] > self.x and pos[0] < self.x + self.width:
+            if pos[1] > self.y and pos[1] < self.y + self.height:
+                return True
+
+        return False
+
+
+
 
 
 list_of_rectangles=[]
 
-rec_1=rectangle_draw(300, 134, 30, 30)
-list_of_rectangles.append( rec_1 )
-rec_2=rectangle_draw(200, 134, 30, 30)
-list_of_rectangles.append( rec_2 )
-rec_3=rectangle_draw(100, 134, 30, 30)
-list_of_rectangles.append( rec_3  )
-rec_4=rectangle_draw(50, 134, 30, 30)
-list_of_rectangles.append( rec_4 )
-circ_1=circle_draw(300,300,20)
-list_of_rectangles.append( circ_1 )
-line_1=line_draw( 40,20,100,20 )
-list_of_rectangles.append( line_1 )
-arc_1=arc_draw( 200,300,100, pi,2*pi )
-list_of_rectangles.append( arc_1)
+#rec_1=rectangle_draw(300, 134, 30, 30)
+#list_of_rectangles.append( rec_1 )
+#rec_2=rectangle_draw(200, 134, 30, 30)
+#list_of_rectangles.append( rec_2 )
+#rec_3=rectangle_draw(100, 134, 30, 30)
+#list_of_rectangles.append( rec_3  )
+#rec_4=rectangle_draw(50, 134, 30, 30)
+#list_of_rectangles.append( rec_4 )
+#circ_1=circle_draw(300,300,20)
+#list_of_rectangles.append( circ_1 )
+#line_1=line_draw( 40,20,100,20 )
+#list_of_rectangles.append( line_1 )
+#arc_1=arc_draw( 200,300, pi,2*pi , 100)
+#list_of_rectangles.append( arc_1)
 
-pp1=[200,30,60]
-pp2=[50,40,70]
-poly= polygon_draw( pp1,pp2 )
-list_of_rectangles.append( poly )
-
-
+#pp1=[200,30,60]
+#pp2=[50,40,70]
+#poly= polygon_draw( pp1,pp2 )
+#list_of_rectangles.append( poly )
 
 
 
 
-pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
+
+
+
+
+
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT) )
 current=-1
+selected=-1
 # - objects -
 
 rectangle = pygame.rect.Rect(260, 134, 60, 60)
@@ -118,23 +417,80 @@ rectangle = pygame.rect.Rect(260, 134, 60, 60)
 
 rectangle_draging = False
 
-# - mainloop -
-
 clock = pygame.time.Clock()
 
 running = True
 
+#These are the primary buttons that needs to have
+endButton=button( (255,255,255), 1150, 10,40, 30, 'X')
+circleButton=button( (255,255,255), 255, 10, 150, 30, 'Circle' )
+lineButton=button((255,255,255), 405, 10, 150, 30, 'Line'  )
+recButton=button((255,255,255), 555, 10, 150, 30, 'Rectangle'  )
+arcButton=button((255,255,255), 705, 10, 150, 30, 'Arc'  )
+polyButton=button((255,255,255), 855, 10, 150, 30, 'Polygon'  )
+graphButton=button((255,255,255), 105, 10, 80, 30, 'Graph'  )
+graph_selected=0
+
+
+#These are the buttons and textboxes for the Circle
+input_box1_circle = InputBox(10, 100, 50, 32)
+input_box2_circle = InputBox(70, 100, 140, 32)
+input_box3_circle = InputBox(10, 150, 140, 32)
+input_boxes_circle = [input_box1_circle, input_box2_circle, input_box3_circle]
+circle_input=button((255,255,255), 70, 150, 60, 32, 'Input' )
+
+
+#These are the buttons and the textboxes for the Line
+input_box1_line = InputBox(10, 100, 50, 32)
+input_box2_line = InputBox(70, 100, 140, 32)
+input_box3_line = InputBox(10, 150, 140, 32)
+input_box4_line = InputBox(70, 150, 140, 32)
+input_boxes_line = [input_box1_line, input_box2_line, input_box3_line, input_box4_line]
+line_input=button((255,255,255), 10, 200, 60, 32, 'Input' )
+
+#These are the buttons and the textboxes for the rectangle
+input_box1_rec = InputBox(10, 100, 50, 32)
+input_box2_rec = InputBox(70, 100, 140, 32)
+input_box3_rec = InputBox(10, 150, 140, 32)
+input_box4_rec = InputBox(70, 150, 140, 32)
+input_boxes_rec = [input_box1_rec, input_box2_rec, input_box3_rec, input_box4_rec]
+rec_input=button((255,255,255), 10, 200, 60, 32, 'Input' )
+rec_fill=button((255,255,255), 10, 250, 60, 32, 'Fill' )
+
+
+#These are the buttons and the textboxes for the arc
+input_box1_arc = InputBox(10, 100, 50, 32)
+input_box2_arc = InputBox(70, 100, 140, 32)
+input_box3_arc = InputBox(10, 150, 140, 32)
+input_box4_arc = InputBox(70, 150, 140, 32)
+input_box5_arc = InputBox(10, 200, 140, 32)
+
+input_boxes_arc = [input_box1_arc, input_box2_arc, input_box3_arc,input_box4_arc,input_box5_arc ]
+arc_input=button((255,255,255), 70, 200, 60, 32, 'Input' )
+
+
+#These are the buttons and the textboxes for the polygon
+input_box1_poly = InputBox(10, 100, 50, 32)
+input_box2_poly= InputBox(70, 100, 500, 32)
+input_boxes_poly = [input_box1_poly, input_box2_poly ]
+poly_input=button((255,255,255), 10, 150, 60, 32, 'Input' )
+
+
+
+
+
+
 while running:
+    #print(current)
 
-    # - events -
-
-   # pp = rectangle_draw( 20,30,40,50 )
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            pos=pygame.mouse.get_pos()
+
             if event.button == 1:
                 for x in range( 0,len(list_of_rectangles) ):
                     if (type(list_of_rectangles[x]) == (rectangle_draw)):
@@ -155,9 +511,10 @@ while running:
                             offset_x = list_of_rectangles[x].x - mouse_x
                             offset_y = list_of_rectangles[x].y - mouse_y
                             current=x
+                            selected=-1
 
                     if(  type(list_of_rectangles[x]) == (circle_draw)) :
-                        mouse_temp_x, mouse_temp_y = event.pos
+                        mouse_temp_x,  mouse_temp_y = event.pos
 
                         if mouse_temp_x >= list_of_rectangles[x].x-list_of_rectangles[x].r and\
                                 mouse_temp_x <= list_of_rectangles[x].x+list_of_rectangles[x].r and\
@@ -165,23 +522,62 @@ while running:
                                 mouse_temp_y <=list_of_rectangles[x].y +list_of_rectangles[x].r and\
                                 ((list_of_rectangles[x].x-mouse_temp_x)**2 +
                                  (list_of_rectangles[x].y-mouse_temp_y)**2)**.5 <=list_of_rectangles[x].r :
-                            rectangle_draging = True
-                            mouse_x, mouse_y = event.pos
-                            offset_x = list_of_rectangles[x].x - mouse_x
-                            offset_y = list_of_rectangles[x].y - mouse_y
-                            current = x
+
+                            if( list_of_rectangles[x].width==1 ):
+                                if( ((list_of_rectangles[x].x-mouse_temp_x)**2 +
+                                 (list_of_rectangles[x].y-mouse_temp_y)**2)**.5 <=list_of_rectangles[x].r+5 and
+                                        ((list_of_rectangles[x].x - mouse_temp_x) ** 2 +
+                                         (list_of_rectangles[x].y - mouse_temp_y) ** 2) ** .5 >= list_of_rectangles[
+                                            x].r - 5
+                                ):
+                                    rectangle_draging = True
+                                    mouse_x, mouse_y = event.pos
+                                    offset_x = list_of_rectangles[x].x - mouse_x
+                                    offset_y = list_of_rectangles[x].y - mouse_y
+                                    current = x
+                                    selected = -1
+
+
+
+                            else:
+                                rectangle_draging = True
+                                mouse_x, mouse_y = event.pos
+                                offset_x = list_of_rectangles[x].x - mouse_x
+                                offset_y = list_of_rectangles[x].y - mouse_y
+                                current = x
+                                selected = -1
+
+
+
 
 
                     if( type(list_of_rectangles[x])==(line_draw) ):
                         mouse_temp_x, mouse_temp_y = event.pos
 
                         temp_obj=list_of_rectangles[x]
+                        if( list_of_rectangles[x].x2-list_of_rectangles[x].x1==0 ):
+                            if( mouse_temp_y>=min( list_of_rectangles[x].y1, list_of_rectangles[x].y2  )-5 and mouse_temp_y<=max( list_of_rectangles[x].y1, list_of_rectangles[x].y2  )+5 and
+                            ( mouse_temp_x>=list_of_rectangles[x].x1-5 and mouse_temp_x<=list_of_rectangles[x].x1+5 )  ):
+                                #print("pupu")
+                                rectangle_draging = True
+                                mouse_x, mouse_y = event.pos
+                                offset_x = list_of_rectangles[x].x1 - mouse_x
+                                offset_y = list_of_rectangles[x].y1 - mouse_y
+                                offset_x2 = list_of_rectangles[x].x2 - mouse_x
+                                offset_y2 = list_of_rectangles[x].y2 - mouse_y
 
-                        if(  math.trunc(round(mouse_temp_y- temp_obj.dhal*mouse_temp_x)) <= math.trunc(round(temp_obj.c) )+10 and
+                                current = x
+                                selected = -1
+
+
+
+
+                        elif(  math.trunc(round(mouse_temp_y- temp_obj.dhal*mouse_temp_x)) <= math.trunc(round(temp_obj.c) )+10 and
                                 math.trunc(round(mouse_temp_y- temp_obj.dhal*mouse_temp_x)) >= math.trunc(round(temp_obj.c) )-10 and
-                                mouse_temp_y >= min(temp_obj.y1, temp_obj.y2)-5 and mouse_temp_y<=max(temp_obj.y1, temp_obj.y2)+5 and
-                                mouse_temp_x >= min(temp_obj.x1, temp_obj.x2)-5 and mouse_temp_x <= max(temp_obj.x1,
-                                                                                                      temp_obj.x2)+5  ):
+                                mouse_temp_y >= min(temp_obj.y1, temp_obj.y2)-10 and mouse_temp_y<=max(temp_obj.y1, temp_obj.y2)+10 and
+                                mouse_temp_x >= min(temp_obj.x1, temp_obj.x2)-10 and mouse_temp_x <= max(temp_obj.x1,
+                                                                                                      temp_obj.x2)+10  ):
+                            #print("pupu")
                             rectangle_draging = True
                             mouse_x, mouse_y = event.pos
                             offset_x = list_of_rectangles[x].x1 - mouse_x
@@ -190,6 +586,8 @@ while running:
                             offset_y2 = list_of_rectangles[x].y2 - mouse_y
 
                             current = x
+                            selected =-1
+
 
 
                     if( type(list_of_rectangles[x])==(arc_draw) ):
@@ -227,8 +625,7 @@ while running:
                             offset_x = list_of_rectangles[x].x - mouse_x
                             offset_y = list_of_rectangles[x].y - mouse_y
                             current = x
-
-
+                            selected=-1
                     if( type( list_of_rectangles[x] )==(polygon_draw) ):
                         coords =  list_of_rectangles[x].get_polygon()
                         poly = Polygon(coords)
@@ -241,6 +638,7 @@ while running:
                             offset_y_list=[]
                             rectangle_draging = True
                             current = x
+                            selected=-1
                             for i in range(len(coords ) ):
                                 offset_x_list.append(mouse_temp_x-coords[i][0] )
 
@@ -250,17 +648,168 @@ while running:
 
 
 
+            if(current!=-1):
+                if(type(list_of_rectangles[current]) == (circle_draw)):
+                    if (list_of_rectangles[current].circle_fill.isOver(pygame.mouse.get_pos())):
+                        if( list_of_rectangles[current].width == 0 ):
+                            list_of_rectangles[current].width = 1
+                        else:
+                            list_of_rectangles[current].width = 0
+
+                    if (list_of_rectangles[current].circle_back.isOver(pygame.mouse.get_pos())):
+                        tempi=list_of_rectangles[current]
+                        del list_of_rectangles[current]
+                        list_of_rectangles.insert(0,tempi)
+                        current=0
+                        print("Backed")
+
+                elif (type(list_of_rectangles[current]) == (line_draw)):
+                    if (list_of_rectangles[current].line_back.isOver(pygame.mouse.get_pos())):
+                        tempi=list_of_rectangles[current]
+                        del list_of_rectangles[current]
+                        list_of_rectangles.insert(0,tempi)
+                        current=0
+                        print("Backed")
+
+                elif (type(list_of_rectangles[current]) == (rectangle_draw)):
+                    if (list_of_rectangles[current].rec_back.isOver(pygame.mouse.get_pos())):
+                        tempi=list_of_rectangles[current]
+                        del list_of_rectangles[current]
+                        list_of_rectangles.insert(0,tempi)
+                        current=0
+                        print("Backed")
+
+                    if (list_of_rectangles[current].rec_fill.isOver(pygame.mouse.get_pos())):
+                        if( list_of_rectangles[current].fill == 0 ):
+                            list_of_rectangles[current].fill = 1
+                        else:
+                            list_of_rectangles[current].fill = 0
+
+                elif (type(list_of_rectangles[current]) == (polygon_draw)):
+                    if (list_of_rectangles[current].poly_back.isOver(pygame.mouse.get_pos())):
+                        tempi=list_of_rectangles[current]
+                        del list_of_rectangles[current]
+                        list_of_rectangles.insert(0,tempi)
+                        current=0
+                        print("Backed")
+
+                    if (list_of_rectangles[current].poly_fill.isOver(pygame.mouse.get_pos())):
+                        if( list_of_rectangles[current].fill == 0 ):
+                            list_of_rectangles[current].fill = 1
+                        else:
+                            list_of_rectangles[current].fill = 0
 
 
 
 
 
 
+            if circleButton.isOver(pos):
+                #print("clicked")
+                selected=1
+                current=-1
+
+            if lineButton.isOver(pos):
+                #print("clicked")
+                selected=2
+                current = -1
+
+            if recButton.isOver(pos):
+                #print("clicked")
+                selected=3
+                current = -1
+
+            if arcButton.isOver(pos):
+                #print("clicked")
+                selected=4
+                current = -1
+
+            if polyButton.isOver(pos):
+                #print("clicked")
+                selected=5
+                current = -1
+
+            if(graphButton.isOver(pos) ):
+                if(graph_selected==0):
+                    graph_selected=1
+                else:
+                    graph_selected = 0
+                current = -1
 
 
 
+            if( endButton.isOver(pos) ):
 
+                running=False
+                #pygame.quit()
 
+            if(selected==1):
+                if( circle_input.isOver(pos) ):
+                     circ_1=circle_draw( int( input_box1_circle.text ) , int( input_box2_circle.text ) ,int( input_box3_circle.text ))
+                     input_box1_circle.change_text()
+                     input_box1_circle.txt_surface = FONT.render(input_box1_circle.text, True, input_box1_circle.color)
+                     input_box2_circle.change_text()
+                     input_box2_circle.txt_surface = FONT.render(input_box2_circle.text, True, input_box2_circle.color)
+                     input_box3_circle.change_text()
+                     input_box3_circle.txt_surface = FONT.render(input_box3_circle.text, True, input_box3_circle.color)
+                     list_of_rectangles.append( circ_1 )
+
+            if(selected==2):
+                if (line_input.isOver(pos)):
+                    line_1 = line_draw(int(input_box1_line.text), int(input_box2_line.text),
+                                         int(input_box3_line.text), int(input_box4_line.text )  )
+                    input_box1_line.change_text()
+                    input_box1_line.txt_surface = FONT.render(input_box1_line.text, True, input_box1_line.color)
+                    input_box2_line.change_text()
+                    input_box2_line.txt_surface = FONT.render(input_box2_line.text, True, input_box2_line.color)
+                    input_box3_line.change_text()
+                    input_box3_line.txt_surface = FONT.render(input_box3_line.text, True, input_box3_line.color)
+                    input_box4_line.change_text()
+                    input_box4_line.txt_surface = FONT.render(input_box4_line.text, True, input_box4_line.color)
+                    list_of_rectangles.append(line_1)
+
+            if(selected==3):
+                if (rec_input.isOver(pos)):
+                    rec_1 = rectangle_draw(int(input_box1_rec.text), int(input_box2_rec.text),
+                                         int(input_box3_rec.text), int(input_box4_rec.text )  )
+                    input_box1_rec.change_text()
+                    input_box1_rec.txt_surface = FONT.render(input_box1_rec.text, True, input_box1_rec.color)
+                    input_box2_rec.change_text()
+                    input_box2_rec.txt_surface = FONT.render(input_box2_rec.text, True, input_box2_rec.color)
+                    input_box3_rec.change_text()
+                    input_box3_rec.txt_surface = FONT.render(input_box3_rec.text, True, input_box3_rec.color)
+                    input_box4_rec.change_text()
+                    input_box4_rec.txt_surface = FONT.render(input_box4_rec.text, True, input_box4_rec.color)
+                    list_of_rectangles.append(rec_1)
+
+            if (selected == 4):
+                if (arc_input.isOver(pos)):
+                    arc_1 = arc_draw(int(input_box1_arc.text), int(input_box2_arc.text),
+                                          round( float(input_box3_arc.text) *( pi/180 ), 3 ) ,round(float(input_box4_arc.text)*( pi/180 ),3) , int(input_box5_arc.text)   )
+                    input_box1_arc.change_text()
+                    input_box1_arc.txt_surface = FONT.render(input_box1_arc.text, True, input_box1_arc.color)
+                    input_box2_arc.change_text()
+                    input_box2_arc.txt_surface = FONT.render(input_box2_arc.text, True, input_box2_arc.color)
+                    input_box3_arc.change_text()
+                    input_box3_arc.txt_surface = FONT.render(input_box3_arc.text, True, input_box3_arc.color)
+                    input_box4_arc.change_text()
+                    input_box4_arc.txt_surface = FONT.render(input_box4_arc.text, True, input_box4_arc.color)
+                    input_box5_arc.change_text()
+                    input_box5_arc.txt_surface = FONT.render(input_box5_arc.text, True, input_box5_arc.color)
+
+                    list_of_rectangles.append(arc_1)
+
+            if(selected == 5):
+                if (poly_input.isOver(pos)):
+                    poly_1 = polygon_draw( input_box1_poly.pp , input_box2_poly.pp )
+                    input_box1_poly.change_text()
+                    input_box1_poly.txt_surface = FONT.render(input_box1_poly.text, True, input_box1_poly.color)
+                    input_box2_poly.change_text()
+                    input_box2_poly.txt_surface = FONT.render(input_box2_poly.text, True, input_box2_poly.color)
+                    input_box1_poly.pp.clear()
+                    input_box2_poly.pp.clear()
+
+                    list_of_rectangles.append(poly_1)
 
 
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -297,28 +846,81 @@ while running:
                     for i in range( 0,len(offset_y_list) ):
                         temp_obj.list_of_y[i]=mouse_y- offset_y_list[i]
 
-
-
-
-
-
                 else:
 
                     mouse_x, mouse_y = event.pos
                     list_of_rectangles[current].x = mouse_x + offset_x
                     list_of_rectangles[current].y = mouse_y + offset_y
 
+        if(selected==1):
+            for box in input_boxes_circle:
+                box.handle_event(event)
+        if( selected==2 ):
+            for box in input_boxes_line:
+                box.handle_event(event)
+
+        if(selected==3):
+            for box in input_boxes_rec:
+                box.handle_event(event)
+
+        if(selected==4 ):
+            for box in input_boxes_arc:
+                box.handle_event(event)
+
+        if(selected==5):
+            for box in input_boxes_poly:
+                box.handle_event(event)
+
+
+
+
+
+    if(selected==1):
+        for box in input_boxes_circle:
+            box.update()
+
+    if (selected == 2):
+        for box in input_boxes_line:
+            box.update()
+
+    if(selected==3 ):
+        for box in input_boxes_rec:
+            box.update()
+
+    if (selected == 4):
+        for box in input_boxes_arc:
+            box.update()
+
+    if(selected==5 ):
+        for box in input_boxes_poly:
+            box.update()
+
+
+
+
 
 
     screen.fill(WHITE)
+
+    if(graph_selected==1):
+        graph_draw()
+
+
+
+
+
+
+    if (current != -1):
+        list_of_rectangles[current].draw()
+
     for obj in list_of_rectangles:
         if (type(obj) == (rectangle_draw)):
             temp_rect=(obj.x,obj.y,obj.height,obj.width)
-            pygame.draw.rect(screen, RED, temp_rect)
+            pygame.draw.rect(screen, RED, temp_rect, obj.fill)
 
         elif (type(obj) == (circle_draw)):
             temp_rect=(obj.x,obj.y)
-            pygame.draw.circle(screen, RED, temp_rect, obj.r )
+            pygame.draw.circle(screen, BLACK, temp_rect, obj.r, obj.width )
 
         elif(type(obj) == (line_draw)  ):
             temp_rect=(obj.x1,obj.y1)
@@ -331,10 +933,45 @@ while running:
         elif( type( obj )==(polygon_draw) ):
             wow=[]
 
-            pygame.draw.polygon(screen, RED, obj.get_polygon())
+            pygame.draw.polygon(screen, RED, obj.get_polygon(), obj.fill)
 
 
 
+    #This are all the basic buttons
+    endButton.draw(screen, (0,0,0))
+    circleButton.draw(screen, (0, 0, 0))
+    lineButton.draw(screen, (0, 0, 0))
+    recButton.draw(screen, (0, 0, 0))
+    arcButton.draw(screen, (0, 0, 0))
+    polyButton.draw(screen, (0, 0, 0))
+    graphButton.draw(screen, (0, 0, 0))
+
+
+    #These are buttons and text boxes for circle
+    if(selected==1):
+        for box in input_boxes_circle:
+            box.draw(screen)
+        circle_input.draw(screen,(0,0,0))
+
+    if (selected == 2):
+        for box in input_boxes_line:
+            box.draw(screen)
+        line_input.draw(screen, (0, 0, 0))
+
+    if(selected==3):
+        for box in input_boxes_rec:
+            box.draw(screen)
+        rec_input.draw(screen, (0, 0, 0))
+
+    if(selected==4):
+        for box in input_boxes_arc:
+            box.draw(screen)
+        arc_input.draw(screen,(0,0,0))
+
+    if(selected==5 ):
+        for box in input_boxes_poly:
+            box.draw(screen)
+        poly_input.draw(screen,(0,0,0))
 
 
 
@@ -345,7 +982,9 @@ while running:
 
     #I have to use this using for loop
     #pygame.draw.rect(screen, RED, rectangle)
+
     pygame.display.flip()
+
 
     # - constant game speed / FPS -
 
