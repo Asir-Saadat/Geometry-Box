@@ -1,5 +1,7 @@
 def work():
     import pygame
+    #import Main_Menu
+
     #from pygame.locals import *
     import math
     from shapely.geometry import Point, Polygon
@@ -8,6 +10,11 @@ def work():
     from functools import reduce
     import operator
     import math
+
+
+
+
+
 
     # --- constants --- (UPPER_CASE names)
     pygame.init()
@@ -24,8 +31,9 @@ def work():
     COLOR_ACTIVE = pygame.Color('dodgerblue2')
     FONT = pygame.font.Font('Wishleman.ttf', 12)
     increment_line = 25
-    number_per_line = 1
-    perspective = 600 / ((increment_line - 1) * number_per_line)
+    npl = 1
+    perspective = (SCREEN_WIDTH/2) / ((increment_line - 1) * npl)
+
 
     pi = 3.141592653
 
@@ -47,11 +55,12 @@ def work():
 
         def draw(self):
             # self.box1_circle.change_text()
-            self.box1_rec.txt_surface = FONT.render(str((self.x - 600) * number_per_line / increment_line), True, BLUE)
+            self.box1_rec.txt_surface = FONT.render(str((self.x - 600) * npl / increment_line), True, BLUE)
             self.box1_rec.draw(screen)
+
             # self.box2_circle.change_text()
             self.box2_rec.txt_surface = FONT.render(
-                str((SCREEN_HEIGHT - self.y - 400) * number_per_line / increment_line), True, BLUE)
+                str((SCREEN_HEIGHT - self.y - 400) * npl / increment_line), True, BLUE)
             self.box2_rec.draw(screen)
             # self.box3_circle.change_text()
             self.box3_rec.txt_surface = FONT.render(str(self.width / perspective), True, BLUE)
@@ -61,6 +70,25 @@ def work():
             self.rec_fill.draw(screen, (0, 0, 0))
             self.rec_back.draw(screen, (0, 0, 0))
             self.rec_delete.draw(screen, (0, 0, 0))
+            message_for_rec()
+
+        def adjust(self, prev):
+            tempi1=((self.x - 600) * prev / increment_line)
+            self.x= 600 + ((tempi1) * increment_line) / npl
+            tempi2 = (SCREEN_HEIGHT - self.y - 400) * prev / increment_line
+            self.y = SCREEN_HEIGHT - (400 + ((tempi2) * increment_line) / npl)
+            tempi3= self.width / ( (SCREEN_WIDTH/2) / ((increment_line - 1) * prev) )
+            self.width =  tempi3 * perspective
+            tempi4 = self.height / ( (SCREEN_WIDTH/2) / ((increment_line - 1) * prev) )
+            self.height = tempi4 * perspective
+
+
+
+
+
+
+
+
 
     class circle_draw:
         def __init__(self, x, y, r):
@@ -78,12 +106,12 @@ def work():
 
         def draw(self):
             # self.box1_circle.change_text()
-            self.box1_circle.txt_surface = FONT.render(str((self.x - 600) * number_per_line / increment_line), True,
+            self.box1_circle.txt_surface = FONT.render(str((self.x - 600) * npl / increment_line), True,
                                                        BLUE)
             self.box1_circle.draw(screen)
             # self.box2_circle.change_text()
             self.box2_circle.txt_surface = FONT.render(
-                str((SCREEN_HEIGHT - self.y - 400) * number_per_line / increment_line), True, BLUE)
+                str((SCREEN_HEIGHT - self.y - 400) * npl / increment_line), True, BLUE)
             self.box2_circle.draw(screen)
             # self.box3_circle.change_text()
             self.box3_circle.txt_surface = FONT.render(str(self.r / perspective), True, BLUE)
@@ -92,6 +120,8 @@ def work():
             self.circle_back.draw(screen, (0, 0, 0))
             self.circle_delete.draw(screen, (0, 0, 0))
             # print("kaka")
+
+            message_for_circle()
 
             for event in pygame.event.get():
                 # if (self.circle_fill.isOver(pygame.mouse.get_pos())):
@@ -105,6 +135,17 @@ def work():
                             self.width = 1
 
                 # list_of_rectangles.append(circ_1)
+
+
+        def adjust(self, prev):
+            tempi1 = ((self.x - 600) * prev / increment_line)
+            self.x = 600 + ((tempi1) * increment_line) / npl
+            tempi2 = (SCREEN_HEIGHT - self.y - 400) * prev / increment_line
+            self.y = SCREEN_HEIGHT - (400 + ((tempi2) * increment_line) / npl)
+            tempi3 = self.r / ((SCREEN_WIDTH / 2) / ((increment_line - 1) * prev))
+            self.r = tempi3 * perspective
+
+
 
     class line_draw:
         def __init__(self, x1, y1, x2, y2):
@@ -135,23 +176,38 @@ def work():
 
         def draw(self):
             # self.box1_circle.change_text()
-            self.box1_line.txt_surface = FONT.render(str((self.x1 - 600) * number_per_line / increment_line), True,
+            self.box1_line.txt_surface = FONT.render(str((self.x1 - 600) * npl / increment_line), True,
                                                      BLUE)
             self.box1_line.draw(screen)
             # self.box2_circle.change_text()
             self.box2_line.txt_surface = FONT.render(
-                str((SCREEN_HEIGHT - self.y1 - 400) * number_per_line / increment_line), True, BLUE)
+                str((SCREEN_HEIGHT - self.y1 - 400) * npl / increment_line), True, BLUE)
             self.box2_line.draw(screen)
             # self.box3_circle.change_text()
-            self.box3_line.txt_surface = FONT.render(str((self.x2 - 600) * number_per_line / increment_line), True,
+            self.box3_line.txt_surface = FONT.render(str((self.x2 - 600) * npl / increment_line), True,
                                                      BLUE)
             self.box3_line.draw(screen)
             self.box4_line.txt_surface = FONT.render(
-                str((SCREEN_HEIGHT - self.y2 - 400) * number_per_line / increment_line), True, BLUE)
+                str((SCREEN_HEIGHT - self.y2 - 400) * npl / increment_line), True, BLUE)
             self.box4_line.draw(screen)
             # self.circle_fill.draw(screen, (0, 0, 0))
             self.line_back.draw(screen, (0, 0, 0))
             self.line_delete.draw(screen, (0, 0, 0))
+
+            message_for_line()
+
+        def adjust(self, prev):
+            tempi1 = ((self.x1 - 600) * prev / increment_line)
+            self.x1 = 600 + ((tempi1) * increment_line) / npl
+            tempi2 = (SCREEN_HEIGHT - self.y1 - 400) * prev / increment_line
+            self.y1 = SCREEN_HEIGHT - (400 + ((tempi2) * increment_line) / npl)
+            tempi3 = ((self.x2 - 600) * prev / increment_line)
+            self.x2 = 600 + ((tempi3) * increment_line) / npl
+            tempi4 = (SCREEN_HEIGHT - self.y2 - 400) * prev / increment_line
+            self.y2 = SCREEN_HEIGHT - (400 + ((tempi4) * increment_line) / npl)
+
+
+
 
     class arc_draw:
         def __init__(self, x, y, start, end, r):
@@ -171,11 +227,11 @@ def work():
 
         def draw(self):
             # self.box1_circle.change_text()
-            self.box1_arc.txt_surface = FONT.render(str((self.x - 600) * number_per_line / increment_line), True, BLUE)
+            self.box1_arc.txt_surface = FONT.render(str((self.x - 600) * npl / increment_line), True, BLUE)
             self.box1_arc.draw(screen)
             # self.box2_circle.change_text()
             self.box2_arc.txt_surface = FONT.render(
-                str(((SCREEN_HEIGHT - self.y - 400) * number_per_line / increment_line)), True, BLUE)
+                str(((SCREEN_HEIGHT - self.y - 400) * npl / increment_line)), True, BLUE)
             self.box2_arc.draw(screen)
             # self.box3_circle.change_text()
             self.box3_arc.txt_surface = FONT.render(str(int(self.start * (180 / pi))), True, BLUE)
@@ -185,9 +241,18 @@ def work():
             self.box5_arc.txt_surface = FONT.render(str(self.r / perspective), True, BLUE)
             self.box5_arc.draw(screen)
             self.arc_delete.draw(screen, (0, 0, 0))
+            message_for_arc()
 
             # self.circle_fill.draw(screen, (0, 0, 0))
             # self.arc_back.draw(screen, (0, 0, 0))
+
+        def adjust(self, prev):
+            tempi1 = ((self.x - 600) * prev / increment_line)
+            self.x = 600 + ((tempi1) * increment_line) / npl
+            tempi2 = (SCREEN_HEIGHT - self.y - 400) * prev / increment_line
+            self.y = SCREEN_HEIGHT - (400 + ((tempi2) * increment_line) / npl)
+            tempi3 = self.r / ((SCREEN_WIDTH / 2) / ((increment_line - 1) * prev))
+            self.r = tempi3 * perspective
 
     class polygon_draw:
         def __init__(self, list_of_x, list_of_y):
@@ -235,17 +300,32 @@ def work():
             self.poly_back.draw(screen, (0, 0, 0))
             self.poly_fill.draw(screen, (0, 0, 0))
             self.poly_delete.draw(screen, (0, 0, 0))
+            follow=1
 
             for i in range(0, len(self.list_of_x)):
                 temp_box_1 = InputBox(10, start, 50, 32)
                 temp_box_2 = InputBox(70, start, 50, 32)
+                message_to_screen( "X"+str(follow), RED, 20, start+40, 10 )
+                message_to_screen("Y"+str(follow), RED, 80, start + 40, 10)
+                follow+=1
+
+
                 start += 50
-                temp_box_1.txt_surface = FONT.render(str((self.list_of_x[i] - 600) * number_per_line / increment_line),
+                temp_box_1.txt_surface = FONT.render(str((self.list_of_x[i] - 600) * npl / increment_line),
                                                      True, BLUE)
                 temp_box_1.draw(screen)
                 temp_box_2.txt_surface = FONT.render(
-                    str(((SCREEN_HEIGHT - self.list_of_y[i] - 400) * number_per_line / increment_line)), True, BLUE)
+                    str(((SCREEN_HEIGHT - self.list_of_y[i] - 400) * npl / increment_line)), True, BLUE)
                 temp_box_2.draw(screen)
+
+        def adjust(self, prev):
+
+            for i in range( len(self.list_of_x) ):
+                tempi1 = ((self.list_of_x[i] - 600) * prev / increment_line)
+                self.list_of_x[i]= 600 + ((tempi1) * increment_line) / npl
+                tempi2 = (SCREEN_HEIGHT - self.list_of_y[i] - 400) * prev / increment_line
+                self.list_of_y[i] = SCREEN_HEIGHT - (400 + ((tempi2) * increment_line) / npl)
+
 
     class InputBox:
 
@@ -314,40 +394,73 @@ def work():
         textRect.center = (x_position, y_position)
         screen.blit(textSurf, textRect)
 
+
+    def label( msg, color, x_position, y_position, size, new_size):
+        textSurf, textRect = text_objects(msg, color, size)
+        textRect.center = (x_position, y_position)
+        screen.blit(textSurf,new_size)
+
+
+    def message_for_circle():
+        message_to_screen("X", RED, message_boxes_circle[0][0], message_boxes_circle[0][1], 10)
+        message_to_screen("Y", RED, message_boxes_circle[1][0], message_boxes_circle[1][1], 10)
+        message_to_screen("Radius", RED, message_boxes_circle[2][0], message_boxes_circle[2][1], 10)
+
+
+    def message_for_line():
+        message_to_screen("X1", RED, message_boxes_line[0][0], message_boxes_line[0][1], 10)
+        message_to_screen("Y1", RED, message_boxes_line[1][0], message_boxes_line[1][1], 10)
+        message_to_screen("X2", RED, message_boxes_line[2][0], message_boxes_line[2][1], 10)
+        message_to_screen("y2", RED, message_boxes_line[3][0], message_boxes_line[3][1], 10)
+
+    def message_for_rec():
+        message_to_screen("X1", RED, message_boxes_rec[0][0], message_boxes_rec[0][1], 10)
+        message_to_screen("Y1", RED, message_boxes_rec[1][0], message_boxes_rec[1][1], 10)
+        message_to_screen("WIDTH", RED, message_boxes_rec[2][0], message_boxes_rec[2][1], 10)
+        message_to_screen("HEIGHT", RED, message_boxes_rec[3][0], message_boxes_rec[3][1], 10)
+
+    def message_for_arc():
+        message_to_screen("X", RED, message_boxes_arc[0][0], message_boxes_arc[0][1], 10)
+        message_to_screen("Y", RED, message_boxes_arc[1][0], message_boxes_arc[1][1], 10)
+        message_to_screen("THETA1", RED, message_boxes_arc[2][0], message_boxes_arc[2][1], 10)
+        message_to_screen("THETA2", RED, message_boxes_arc[3][0], message_boxes_arc[3][1], 10)
+        message_to_screen("RADIUS", RED, message_boxes_arc[4][0], message_boxes_arc[4][1], 10)
+
+
     def graph_draw():
         start_count = 0
 
-        for x in range(600, 1200, increment_line):
-            if (x == 600):
-                pygame.draw.line(screen, BLUE, (x, 0), (x, 800), 5)
+        for x in range(int(SCREEN_WIDTH/2), SCREEN_WIDTH, increment_line):
+            if (x == SCREEN_WIDTH/2):
+                pygame.draw.line(screen, BLUE, (x, 0), (x, SCREEN_HEIGHT), 5)
             else:
-                pygame.draw.line(screen, BLACK, (x, 0), (x, 800))
+                pygame.draw.line(screen, BLACK, (x, 0), (x, SCREEN_HEIGHT))
 
-            message_to_screen(str(start_count), RED, x, 400 + 10, 10)
-            start_count += number_per_line
+            message_to_screen(str(start_count), RED, x, SCREEN_HEIGHT/2 + 10, 10)
+            start_count += npl
 
-        start_count = 0 - number_per_line
-        for x in range(600 - increment_line, 0, -increment_line):
-            pygame.draw.line(screen, BLACK, (x, 0), (x, 800))
-            message_to_screen(str(start_count), RED, x, 400 + 10, 10)
-            start_count -= number_per_line
+        start_count = 0 - npl
+        for x in range( int(SCREEN_WIDTH/2) - increment_line, 0, -increment_line):
+            pygame.draw.line(screen, BLACK, (x, 0), (x, SCREEN_HEIGHT))
+            message_to_screen(str(start_count), RED, x, SCREEN_HEIGHT/2  + 10, 10)
+            start_count -= npl
 
         start_count = 0
-        for x in range(400, 800, increment_line):
-            if (x == 400):
-                pygame.draw.line(screen, BLUE, (0, x), (1200, x), 5)
+        for x in range(int(SCREEN_HEIGHT/2), SCREEN_HEIGHT, increment_line):
+            if (x == SCREEN_HEIGHT/2):
+                pygame.draw.line(screen, BLUE, (0, x), (SCREEN_WIDTH, x), 5)
             else:
                 pygame.draw.line(screen, BLACK
-                                 , (0, x), (1200, x))
-                message_to_screen(str(start_count), RED, 600 + 10, x, 10)
+                                 , (0, x), (SCREEN_WIDTH, x))
+                message_to_screen(str(start_count), RED, SCREEN_WIDTH/2 + 10, x, 10)
                 # message_to_screen(str(start_count), blue, 600 + 10, x, 10)
-            start_count -= number_per_line
+            start_count -= npl
 
-        start_count = 0 + number_per_line
-        for x in range(400 - increment_line, 0, -increment_line):
-            pygame.draw.line(screen, BLACK, (0, x), (1200, x))
-            message_to_screen(str(start_count), RED, 600 + 10, x, 10)
-            start_count += number_per_line
+        start_count = 0 + npl
+        for x in range(int(SCREEN_HEIGHT/2) - increment_line, 0, -increment_line):
+            pygame.draw.line(screen, BLACK, (0, x), (SCREEN_WIDTH, x))
+            message_to_screen(str(start_count), RED, SCREEN_WIDTH/2 + 10, x, 10)
+            start_count += npl
 
     class button():
         def __init__(self, color, x, y, width, height, text=''):
@@ -368,7 +481,7 @@ def work():
             # pygame.draw.rect(screen, self.color, (self.x, self.y, self.width, self.height), 0)
 
             if self.text != '':
-                font = pygame.font.Font('Wishleman.ttf', 15)
+                font = pygame.font.Font('Simple Story.ttf', 15)
                 pos = pygame.mouse.get_pos()
                 # print(pos[0])
                 # print(pos[1])
@@ -393,6 +506,10 @@ def work():
                     return True
 
             return False
+
+
+
+
 
     list_of_rectangles = []
 
@@ -428,6 +545,9 @@ def work():
     # this is the width of the rectangle
     # this is the height of the rectangle
 
+
+
+
     rectangle_draging = False
 
     clock = pygame.time.Clock()
@@ -442,49 +562,78 @@ def work():
     arcButton = button((255, 255, 255), 705, 10, 150, 30, 'Arc')
     polyButton = button((255, 255, 255), 855, 10, 150, 30, 'Polygon')
     graphButton = button((255, 255, 255), 105, 10, 80, 30, 'Graph')
+    plusButton=button((255, 255, 255), 10, 10, 30, 30, '+')
+    minusButton =button((255, 255, 255), 45, 10, 30, 30, '-')
     graph_selected = 0
 
     # These are the buttons and textboxes for the Circle
     input_box1_circle = InputBox(10, 100, 50, 32)
+    message_1_circle=(20, 140)
     input_box2_circle = InputBox(70, 100, 140, 32)
+    message_2_circle = (80, 140)
     input_box3_circle = InputBox(10, 150, 140, 32)
+    message_3_circle = (30, 190)
     input_boxes_circle = [input_box1_circle, input_box2_circle, input_box3_circle]
+    message_boxes_circle=[message_1_circle, message_2_circle, message_3_circle  ]
     circle_input = button((255, 255, 255), 70, 150, 60, 32, 'Input')
+
 
     # These are the buttons and the textboxes for the Line
     input_box1_line = InputBox(10, 100, 50, 32)
+    message_1_line = (20, 140)
     input_box2_line = InputBox(70, 100, 140, 32)
+    message_2_line = (80, 140)
     input_box3_line = InputBox(10, 150, 140, 32)
+    message_3_line = (20, 190)
     input_box4_line = InputBox(70, 150, 140, 32)
+    message_4_line = (80, 190)
     input_boxes_line = [input_box1_line, input_box2_line, input_box3_line, input_box4_line]
     line_input = button((255, 255, 255), 10, 200, 60, 32, 'Input')
+    message_boxes_line = [message_1_line, message_2_line, message_3_line, message_4_line]
 
     # These are the buttons and the textboxes for the rectangle
     input_box1_rec = InputBox(10, 100, 50, 32)
+    message_1_rec = (20, 140)
     input_box2_rec = InputBox(70, 100, 140, 32)
+    message_2_rec = (80, 140)
     input_box3_rec = InputBox(10, 150, 140, 32)
+    message_3_rec = (30, 190)
     input_box4_rec = InputBox(70, 150, 140, 32)
+    message_4_rec = (95, 190)
     input_boxes_rec = [input_box1_rec, input_box2_rec, input_box3_rec, input_box4_rec]
     rec_input = button((255, 255, 255), 10, 200, 60, 32, 'Input')
     rec_fill = button((255, 255, 255), 10, 250, 60, 32, 'Fill')
+    message_boxes_rec = [message_1_rec, message_2_rec, message_3_rec, message_4_rec]
 
     # These are the buttons and the textboxes for the arc
     input_box1_arc = InputBox(10, 100, 50, 32)
+    message_1_arc = (20, 140)
     input_box2_arc = InputBox(70, 100, 140, 32)
+    message_2_arc = (80, 140)
     input_box3_arc = InputBox(10, 150, 140, 32)
+    message_3_arc = (30, 190)
     input_box4_arc = InputBox(70, 150, 140, 32)
+    message_4_arc = (90, 190)
     input_box5_arc = InputBox(10, 200, 140, 32)
+    message_5_arc = (30, 240)
+    message_boxes_arc = [message_1_arc, message_2_arc, message_3_arc, message_4_arc, message_5_arc]
 
     input_boxes_arc = [input_box1_arc, input_box2_arc, input_box3_arc, input_box4_arc, input_box5_arc]
     arc_input = button((255, 255, 255), 70, 200, 60, 32, 'Input')
 
     # These are the buttons and the textboxes for the polygon
     input_box1_poly = InputBox(10, 100, 50, 32)
+    message_1_poly= (20, 140)
     input_box2_poly = InputBox(70, 100, 500, 32)
+    message_2_poly = (80, 140)
     input_boxes_poly = [input_box1_poly, input_box2_poly]
+    message_boxes_poly = [message_1_poly, message_2_poly]
+
     poly_input = button((255, 255, 255), 10, 150, 60, 32, 'Input')
 
+
     while running:
+        #print(npl)
         # print(current)
 
         for event in pygame.event.get():
@@ -763,14 +912,41 @@ def work():
                     # current = -1
 
                 if (endButton.isOver(pos)):
+                    import Main_Menu
                     running = False
-                    # pygame.quit()
+                    Main_Menu.go()
+                    pygame.quit()
+                    return
+
+
+                if( plusButton.isOver(pos) ):
+
+                    npl+=1
+                    #increment_line+=1
+                    perspective = (SCREEN_WIDTH / 2) / ((increment_line - 1) * npl)
+                    for oop in list_of_rectangles:
+                        oop.adjust(npl-1)
+
+
+                    #increment_line+=1
+
+                if (minusButton.isOver(pos)):
+                    if(npl==1):
+                        continue
+                    npl -= 1
+                    perspective = (SCREEN_WIDTH / 2) / ((increment_line - 1) * npl)
+                    # increment_line+=1
+                    for oop in list_of_rectangles:
+                        oop.adjust(npl+1)
+
+
+
 
                 if (selected == 1):
                     if (circle_input.isOver(pos)):
-                        circ_1 = circle_draw(600 + (int(input_box1_circle.text) * increment_line) / number_per_line,
+                        circ_1 = circle_draw(600 + (int(input_box1_circle.text) * increment_line) / npl,
                                              SCREEN_HEIGHT - (400 + (int(
-                                                 input_box2_circle.text) * increment_line) / number_per_line),
+                                                 input_box2_circle.text) * increment_line) / npl),
                                              perspective * int(input_box3_circle.text))
                         input_box1_circle.change_text()
                         input_box1_circle.txt_surface = FONT.render(input_box1_circle.text, True,
@@ -785,12 +961,12 @@ def work():
 
                 if (selected == 2):
                     if (line_input.isOver(pos)):
-                        line_1 = line_draw(600 + (int(input_box1_line.text) * increment_line) / number_per_line,
+                        line_1 = line_draw(600 + (int(input_box1_line.text) * increment_line) / npl,
                                            SCREEN_HEIGHT - (400 + (
-                                                       int(input_box2_line.text) * increment_line) / number_per_line),
-                                           600 + (int(input_box3_line.text) * increment_line) / number_per_line,
+                                                       int(input_box2_line.text) * increment_line) / npl),
+                                           600 + (int(input_box3_line.text) * increment_line) / npl,
                                            SCREEN_HEIGHT - (400 + (
-                                                       int(input_box4_line.text) * increment_line) / number_per_line))
+                                                       int(input_box4_line.text) * increment_line) / npl))
                         input_box1_line.change_text()
                         input_box1_line.txt_surface = FONT.render(input_box1_line.text, True, input_box1_line.color)
                         input_box2_line.change_text()
@@ -803,9 +979,9 @@ def work():
 
                 if (selected == 3):
                     if (rec_input.isOver(pos)):
-                        rec_1 = rectangle_draw(600 + (int(input_box1_rec.text) * increment_line) / number_per_line,
+                        rec_1 = rectangle_draw(600 + (int(input_box1_rec.text) * increment_line) / npl,
                                                SCREEN_HEIGHT - (400 + (int(
-                                                   input_box2_rec.text) * increment_line) / number_per_line),
+                                                   input_box2_rec.text) * increment_line) / npl),
                                                int(input_box3_rec.text) * perspective,
                                                int(input_box4_rec.text) * perspective)
                         input_box1_rec.change_text()
@@ -820,9 +996,9 @@ def work():
 
                 if (selected == 4):
                     if (arc_input.isOver(pos)):
-                        arc_1 = arc_draw(600 + (int(input_box1_arc.text) * increment_line) / number_per_line,
+                        arc_1 = arc_draw(600 + (int(input_box1_arc.text) * increment_line) / npl,
                                          SCREEN_HEIGHT - (400 + (
-                                                     int(input_box2_arc.text) * increment_line) / number_per_line),
+                                                     int(input_box2_arc.text) * increment_line) / npl),
                                          round(float(input_box3_arc.text) * (pi / 180), 3),
                                          round(float(input_box4_arc.text) * (pi / 180), 3),
                                          int(input_box5_arc.text) * perspective)
@@ -843,11 +1019,11 @@ def work():
                     if (poly_input.isOver(pos)):
 
                         for i in range(0, len(input_box1_poly.pp)):
-                            input_box1_poly.pp[i] = 600 + (input_box1_poly.pp[i] * increment_line) / number_per_line
+                            input_box1_poly.pp[i] = 600 + (input_box1_poly.pp[i] * increment_line) / npl
 
                         for i in range(0, len(input_box2_poly.pp)):
                             input_box2_poly.pp[i] = SCREEN_HEIGHT - (
-                                        400 + (input_box2_poly.pp[i] * increment_line) / number_per_line)
+                                        400 + (input_box2_poly.pp[i] * increment_line) / npl)
 
                         poly_1 = polygon_draw(input_box1_poly.pp, input_box2_poly.pp)
                         input_box1_poly.change_text()
@@ -950,10 +1126,12 @@ def work():
                 temp_rect = (obj.x, obj.y, obj.height, obj.width)
                 pygame.draw.rect(screen, RED, temp_rect, obj.fill)
 
+
+
             elif (type(obj) == (circle_draw)):
                 temp_rect = (obj.x, obj.y)
                 # print(temp_rect)
-                pygame.draw.circle(screen, BLACK, temp_rect, obj.r, obj.width)
+                pygame.draw.circle(screen, RED, temp_rect, obj.r, obj.width)
 
             elif (type(obj) == (line_draw)):
                 temp_rect = (obj.x1, obj.y1)
@@ -979,32 +1157,49 @@ def work():
         arcButton.draw(screen, (0, 0, 0))
         polyButton.draw(screen, (0, 0, 0))
         graphButton.draw(screen, (0, 0, 0))
+        plusButton.draw(screen, (0,0,0))
+        minusButton.draw(screen, (0, 0, 0))
 
         # These are buttons and text boxes for circle
         if (selected == 1):
             for box in input_boxes_circle:
                 box.draw(screen)
             circle_input.draw(screen, (0, 0, 0))
+            #message_to_screen(str(234324), RED, 50, 50, 50)
+
+            message_for_circle()
 
         if (selected == 2):
             for box in input_boxes_line:
                 box.draw(screen)
             line_input.draw(screen, (0, 0, 0))
+            message_for_line()
+
+
 
         if (selected == 3):
             for box in input_boxes_rec:
                 box.draw(screen)
             rec_input.draw(screen, (0, 0, 0))
 
+            message_for_rec()
+
+
         if (selected == 4):
             for box in input_boxes_arc:
                 box.draw(screen)
             arc_input.draw(screen, (0, 0, 0))
 
+            message_for_arc()
+
+
+
         if (selected == 5):
             for box in input_boxes_poly:
                 box.draw(screen)
             poly_input.draw(screen, (0, 0, 0))
+            message_to_screen("X", RED, message_boxes_poly[0][0], message_boxes_poly[0][1], 10)
+            message_to_screen("Y", RED, message_boxes_poly[1][0], message_boxes_poly[1][1], 10)
 
         # I have to use this using for loop
         # pygame.draw.rect(screen, RED, rectangle)
@@ -1018,3 +1213,5 @@ def work():
     # - end -
 
     pygame.quit()
+
+work()
