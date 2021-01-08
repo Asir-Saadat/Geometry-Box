@@ -6,7 +6,7 @@ def work():
     import math
     from shapely.geometry import Point, Polygon
     import pygame_widgets as pw
-    import Button_part_2
+
     from functools import reduce
     import operator
     import math
@@ -242,9 +242,9 @@ def work():
                 str(  round((SCREEN_HEIGHT - self.y - 400) * npl / increment_line, 2)), True, BLUE)
             self.box2_arc.draw(screen)
             # self.box3_circle.change_text()
-            self.box3_arc.txt_surface = FONT.render(str(float(self.start * (180 / pi))), True, BLUE)
+            self.box3_arc.txt_surface = FONT.render(str( round( float(self.start * (180 / pi)), 2)  ), True, BLUE)
             self.box3_arc.draw(screen)
-            self.box4_arc.txt_surface = FONT.render(str(float(self.end * (180 / pi))), True, BLUE)
+            self.box4_arc.txt_surface = FONT.render(str( round( float(self.end * (180 / pi)), 2) ), True, BLUE)
             self.box4_arc.draw(screen)
             self.box5_arc.txt_surface = FONT.render(str( round(  self.r / perspective , 2) ), True, BLUE)
             self.box5_arc.draw(screen)
@@ -543,7 +543,7 @@ def work():
     # poly= polygon_draw( pp1,pp2 )
     # list_of_rectangles.append( poly )
 
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
     current = -1
     selected = -1
     # - objects -
@@ -1166,12 +1166,12 @@ def work():
                             temp_obj.list_of_y[i] = mouse_y - offset_y_list[i]
 
 
-                    if( type(list_of_rectangles[current]) == (line_draw) and line_point_selected==1 ):
+                    elif( type(list_of_rectangles[current]) == (line_draw) and line_point_selected==1 ):
                         mouse_x, mouse_y = event.pos
                         list_of_rectangles[current].x1 = mouse_x + offset_x
                         list_of_rectangles[current].y1 = mouse_y + offset_y
 
-                    if (type(list_of_rectangles[current]) == (line_draw) and line_point_selected == 2):
+                    elif (type(list_of_rectangles[current]) == (line_draw) and line_point_selected == 2):
                         mouse_x, mouse_y = event.pos
                         list_of_rectangles[current].x2 = mouse_x + offset_x
                         list_of_rectangles[current].y2 = mouse_y + offset_y
