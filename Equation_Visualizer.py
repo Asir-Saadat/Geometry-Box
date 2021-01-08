@@ -39,7 +39,7 @@ def work():
         textRect.center = (x_position, y_position)
         gameDisplay.blit(textSurf, textRect)
 
-    gameDisplay = pygame.display.set_mode((display_width, display_height))
+    gameDisplay = pygame.display.set_mode((display_width, display_height), pygame.FULLSCREEN)
 
     white = (255, 255, 255)
     black = (0, 0, 0)
@@ -315,7 +315,8 @@ def work():
                         color = color_active
 
                     if input_box_3.collidepoint(event.pos):
-                        adjust_point(-1)
+                        import Main_Menu
+                        Main_Menu.go()
 
                     if input_box_4.collidepoint(event.pos):
                         adjust_point(1)
